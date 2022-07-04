@@ -14,7 +14,7 @@ RADIAL=0
 FGONG=0
 OMP_NUM_THREADS=1
 SCALE=0 # Use scaling relations to find lower bound 
-LOWER=0.1
+LOWER=1000
 CONVERT=0
 UPPER=8496 # Kepler Nyquist frequency in microHertz 
 UNITS="UHZ"
@@ -32,6 +32,7 @@ while [ "$#" -gt 0 ]; do
     -r) RADIAL=1; shift 1;;
     -d) DIPOLE=1; shift 1;;
     -e) EIGENF=1;SAVE=1; shift 1;;
+    -f) FGONG=1; shift 1;;
     -s) SAVE=1; shift 1;;
     -R) RESOLUTION=1; shift 1;;
     -S) SCALE=1; shift 1;;
@@ -50,7 +51,7 @@ done
 
 if [ $HELP -gt 0 ] || [ -z "$INPUT" ]; then
     echo "Converter for .GYRE files to oscillation mode frequencies."
-    echo "Usage: ./gyre2freqs.sh -i input -o output -t threads -e -r -l 1000"
+    echo "Usage: ./gyre2freqs.sh -i input -o output -t threads"
     echo "Flags: -s : save calculations directory"
     echo "       -e : calculate eigenfunctions (automatically turns on -s)"
     echo "       -r : only calculate radial modes"
@@ -125,7 +126,7 @@ if [ $RESOLUTION -gt 0 ]; then
 /
 "
 else
-    N_FREQ=1000
+    N_FREQ=100
     GRID="
 &grid
     w_ctr = 10
@@ -133,6 +134,13 @@ else
     w_exp = 2
 /
 "
+fi
+
+if [ $FGONG -gt 0 ]; then 
+    FORMAT="'FGONG'
+    !data_format = '(1P5E16.9,x)'"
+else
+    FORMAT="'MESA'"
 fi
 
 MODE_ITEM_LIST=''
@@ -146,21 +154,14 @@ fi
 # use the scaling relations to calculate lower frequency bound 
 # only works on .GYRE files for now 
 if [ $SCALE -gt 0 ]; then
-    #pnum=$(echo "$pname" | sed 's/profile//g')
-    #profs<-read.table('../profiles.index', skip=1)
-    #which[profs$V1==$pnum]
-    
     # get the first line of the GYRE file 
     read -r FIRSTLINE < "$INPUT"
-    #LASTLINE=$(awk '/./{line=$0} END{print line}' "$INPUT")
     
-    # pull out M, R, Teff from the GYRE file of the stellar model 
-    # https://bitbucket.org/rhdtownsend/gyre/src/tip/doc/mesa-format.pdf
+    # pull out M and Rfrom the GYRE file of the stellar model 
     M=$(echo $FIRSTLINE | awk '{print $2}')
     R=$(echo $FIRSTLINE | awk '{print $3}')
-    #T=$(echo $LASTLINE  | awk '{print $6}')
     
-    # assumes that Teff is in the 7th column of the profile file header 
+    # get Teff from the 7th column of the profile file header 
     T=$(sed '3q;d' "${INPUT::-5}" | awk '{print $7}')
     
     # divide by the solar values 
@@ -253,12 +254,16 @@ $GYRE_DIR/bin/gyre gyre.in &>gyre.out
 #exit 
 
 ### Hooray!
-cp "$fname.dat" ..
-echo "Conversion complete. Results can be found in $fname.dat"
-if [ $SAVE -gt 0 ]; then exit 0; fi
-rm -rf *
-currdir=$(pwd)
+if [ -f "$fname.dat" ]; then
+    cp "$fname.dat" ..
+    echo "Conversion complete. Results can be found in $fname.dat"
+    if [ $SAVE -gt 0 ]; then exit 0; fi
+    rm -rf *
+    currdir=$(pwd)
+    cd ..
+    rm -rf "$currdir"
+    exit 0
+fi
+echo "Something went wrong. Perhaps the following will help:"
+cat gyre.out
 cd ..
-rm -rf "$currdir"
-exit 0
-
