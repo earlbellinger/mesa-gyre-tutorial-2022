@@ -1,8 +1,8 @@
 **TASC6/KASC13 Workshop**
 
-MESA and GYRE: stellar models for asteroseismology
+MESA and GYRE
 ===
-Invited tutorial given at the TASC6/KASC13 workshop
+Invited tutorial on making stellar models for asteroseismology
 
 Earl Patrick Bellinger<sup>1,2</sup>\
 <sub><sup>1</sup> Max Planck Institute for Astrophysics, Germany</sub>\
