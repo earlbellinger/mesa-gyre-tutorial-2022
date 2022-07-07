@@ -3,8 +3,8 @@
 
     relax_initial_y = .true.
     relax_initial_z = .true.
-    new_y = 0.285
-    new_z = 0.0185
+    new_y = 0.269
+    new_z = 0.0187
 / ! end of star_job namelist
 
 
@@ -18,7 +18,7 @@
 &kap
   ! kap options
   ! see kap/defaults/kap.defaults
-  Zbase = 0.0185
+  Zbase = 0.0187
 
 / ! end of kap namelist
 
@@ -28,13 +28,13 @@
     
   ! starting specifications
     initial_mass = 1 ! in Msun units
-    !initial_z = 0.0185
-    !initial_y = 0.285
-    mixing_length_alpha = 1.91
+    mixing_length_alpha = 2.22
+    
+    log_Teff_lower_limit = 3.751
     
   ! stop when the center mass fraction of h1 drops below this limit
-    xa_central_lower_limit_species(1) = 'h1'
-    xa_central_lower_limit(1) = 1d-3
+    !xa_central_lower_limit_species(1) = 'h1'
+    !xa_central_lower_limit(1) = 1d-5
     
   ! input physics 
     do_element_diffusion = .true.
@@ -42,7 +42,7 @@
   ! asteroseismology
     write_pulse_data_with_profile = .true.
     add_atmosphere_to_pulse_data = .true.
-    profile_interval = 10
+    profile_interval = 20
     
 / ! end of controls namelist
 

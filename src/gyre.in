@@ -34,9 +34,9 @@
 &scan
     grid_type = 'LINEAR'
     freq_min_units = 'UHZ'
-    freq_max_units = 'UHZ'
+    freq_max_units = 'ACOUSTIC_CUTOFF'
     freq_min = 1000
-    freq_max = 8496
+    freq_max = 1
     n_freq = 100
 /
 
