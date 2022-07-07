@@ -1,0 +1,70 @@
+&model
+    model_type = 'EVOL'
+    file = '../profile1.data.FGONG'
+    file_format = 'FGONG'
+    !data_format = '(1P5E16.9,x)'
+/
+
+&constants
+/
+
+
+&mode
+    l=0
+/
+&mode
+    l=1
+/
+&mode
+    l=2
+/
+&mode
+    l=3
+/
+
+
+&osc
+    outer_bound = 'JCD'
+    variables_set = 'JCD'
+    inertia_norm = 'BOTH'
+    x_ref = 1
+/
+
+&num
+    diff_scheme = 'MAGNUS_GL4'
+/
+
+&scan
+    grid_type = 'LINEAR'
+    freq_min_units = 'UHZ' !'UHZ'
+    freq_max_units = 'ACOUSTIC_CUTOFF' !'UHZ' !'UHZ'
+    freq_min = 1000
+    freq_max = 1 !
+    n_freq = 100
+/
+
+
+&grid
+    w_ctr = 10
+    w_osc = 10
+    w_exp = 2
+/
+
+
+&rot
+/
+
+&ad_output
+    summary_file = 'profile1-freqs.dat'
+    summary_file_format = 'TXT'
+    summary_item_list = 'l,n_pg,n_p,n_g,freq,E_norm'
+    freq_units = 'UHZ' !'UHZ'
+    detail_file_format = 'TXT'
+    detail_template = '%L_%N'
+    detail_item_list = 'M_star,R_star,l,n_pg,n_p,n_g,freq,E,E_p,E_g,E_norm,M_r,x,xi_r,xi_h'
+/
+
+&nad_output
+/
+
+

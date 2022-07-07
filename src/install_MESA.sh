@@ -1,9 +1,14 @@
 #!/bin/bash
 
-#### A script to install the MESA SDK and MESA to a 64-bit Linux system
+#### A script to install the MESA SDK and MESA to a 64-bit Linux system 
 #### Author: Earl Patrick Bellinger ( bellinger@phys.au.dk ) 
 #### Max Planck Institute for Astrophysics, Garching, Germany 
 #### Stellar Astrophysics Centre, Aarhus University, Denmark 
+
+# The following is intended to be run line-by-line rather than all at once 
+# This will enable you to catch and fix errors as they arise 
+# See also instructions and solutions here: 
+# https://docs.mesastar.org/en/release-r22.05.1/installation.html 
 
 #################
 ### Variables ###

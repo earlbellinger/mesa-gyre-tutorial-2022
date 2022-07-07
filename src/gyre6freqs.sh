@@ -16,7 +16,7 @@ OMP_NUM_THREADS=1
 SCALE=0 # Use scaling relations to find lower bound 
 LOWER=1000
 CONVERT=0
-UPPER=8496 # Kepler Nyquist frequency in microHertz 
+#UPPER=8496 # Kepler Nyquist frequency in microHertz 
 UNITS="UHZ"
 RESOLUTION=0
 DIPOLE=0
@@ -28,7 +28,7 @@ while [ "$#" -gt 0 ]; do
     -o) OUTPUT="$2"; shift 2;;
     -t) OMP_NUM_THREADS="$2"; shift 2;;
     -l) LOWER="$2"; shift 2;;
-    -u) UPPER="$2"; shift 2;;
+    #-u) UPPER="$2"; shift 2;;
     -r) RADIAL=1; shift 1;;
     -d) DIPOLE=1; shift 1;;
     -e) EIGENF=1;SAVE=1; shift 1;;
@@ -58,7 +58,7 @@ if [ $HELP -gt 0 ] || [ -z "$INPUT" ]; then
     echo "       -d : only calculate dipole modes"
     echo "       -f : FGONG file format"
     echo "       -l : lower bound on frequency search"
-    echo "       -u : upper bound on frequency search"
+    #echo "       -u : upper bound on frequency search"
     echo "       -S : use scaling relations to find lower bound"
     echo "       -U : units such as 'UHZ' (default) or 'CYC_PER_DAY'"
     echo "       -R : increase grid resolution"
@@ -181,8 +181,8 @@ if [ $SCALE -gt 0 ]; then
     LOWER=$(awk -v numax="$numax" -v Dnu="$Dnu" \
         'BEGIN { print numax - 10*Dnu }')
     
-	UPPER=$(awk -v numax="$numax" \
-	    'BEGIN { print numax * 5/3 }')
+	#UPPER=$(awk -v numax="$numax" \
+	#    'BEGIN { print numax * 5/3 }')
 	
     # check that it's greater than 0.1 
     if [ $(echo "$LOWER < 0.1" | bc -l) -gt 0 ]; then
@@ -224,9 +224,9 @@ $MODES
 &scan
     grid_type = '$GRID_TYPE'
     freq_min_units = '$UNITS' !'UHZ'
-    freq_max_units = '$UNITS' !'UHZ'
+    freq_max_units = 'ACOUSTIC_CUTOFF' !'$UNITS' !'UHZ'
     freq_min = $LOWER
-    freq_max = $UPPER
+    freq_max = 1 !$UPPER
     n_freq = $N_FREQ
 /
 
