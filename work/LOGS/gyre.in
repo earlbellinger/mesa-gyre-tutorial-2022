@@ -7,7 +7,6 @@
 &constants
 /
 
-
 &mode
     l=0
 /
@@ -20,7 +19,6 @@
 &mode
     l=3
 /
-
 
 &osc
     outer_bound = 'JCD'
@@ -42,13 +40,11 @@
     n_freq = 100
 /
 
-
 &grid
     w_ctr = 10
     w_osc = 10
     w_exp = 2
 /
-
 
 &rot
 /
@@ -57,12 +53,11 @@
     summary_file = 'profile1-freqs.dat'
     summary_file_format = 'TXT'
     summary_item_list = 'l,n_pg,n_p,n_g,freq,E_norm'
-    freq_units = 'UHZ' !'UHZ'
+    freq_units = 'UHZ'
     detail_file_format = 'TXT'
-    detail_template = '%L_%N'
-    detail_item_list = 'M_star,R_star,l,n_pg,n_p,n_g,freq,E,E_p,E_g,E_norm,M_r,x,xi_r,xi_h'
+    detail_template = 'profile1-freqs/%L_%N'
+    detail_item_list = 'M_star,R_star,l,n_pg,n_p,n_g,freq,E,E_p,E_g,E_norm,M_r,x,xi_r,xi_h' 
 /
 
 &nad_output
 /
-

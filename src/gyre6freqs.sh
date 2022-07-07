@@ -6,17 +6,14 @@
 #### Stellar Astrophysics Centre, Aarhus University, Denmark 
 
 ### Parse command line tokens 
-
 HELP=0
 EIGENF=0
 SAVE=0
 RADIAL=0
 FGONG=0
 OMP_NUM_THREADS=1
-SCALE=0 # Use scaling relations to find lower bound 
 LOWER=1000
 CONVERT=0
-#UPPER=8496 # Kepler Nyquist frequency in microHertz 
 UNITS="UHZ"
 RESOLUTION=0
 DIPOLE=0
@@ -28,14 +25,12 @@ while [ "$#" -gt 0 ]; do
     -o) OUTPUT="$2"; shift 2;;
     -t) OMP_NUM_THREADS="$2"; shift 2;;
     -l) LOWER="$2"; shift 2;;
-    #-u) UPPER="$2"; shift 2;;
     -r) RADIAL=1; shift 1;;
     -d) DIPOLE=1; shift 1;;
     -e) EIGENF=1;SAVE=1; shift 1;;
     -f) FGONG=1; shift 1;;
     -s) SAVE=1; shift 1;;
     -R) RESOLUTION=1; shift 1;;
-    -S) SCALE=1; shift 1;;
     -C) CONVERT=1; shift 1;;
     -U) UNITS="$2"; shift 2;;
     
@@ -58,11 +53,14 @@ if [ $HELP -gt 0 ] || [ -z "$INPUT" ]; then
     echo "       -d : only calculate dipole modes"
     echo "       -f : FGONG file format"
     echo "       -l : lower bound on frequency search"
-    #echo "       -u : upper bound on frequency search"
-    echo "       -S : use scaling relations to find lower bound"
     echo "       -U : units such as 'UHZ' (default) or 'CYC_PER_DAY'"
     echo "       -R : increase grid resolution"
     exit
+fi
+
+if [[ $GYRE_DIR == '' ]]; then 
+    echo "Error: GYRE_DIR not set!"
+    exit 1
 fi
 
 ## Check that the first input (GYRE file) exists
@@ -117,7 +115,7 @@ GRID_TYPE="INVERSE"
 fi
 
 if [ $RESOLUTION -gt 0 ]; then 
-    N_FREQ=10000 #10000
+    N_FREQ=1000 #10000
     GRID="
 &grid
     w_ctr = 50
@@ -137,8 +135,7 @@ else
 fi
 
 if [ $FGONG -gt 0 ]; then 
-    FORMAT="'FGONG'
-    !data_format = '(1P5E16.9,x)'"
+    FORMAT="'FGONG'"
 else
     FORMAT="'MESA'"
 fi
@@ -151,48 +148,8 @@ if [ $EIGENF -gt 0 ]; then
     detail_item_list = 'M_star,R_star,l,n_pg,n_p,n_g,freq,E,E_p,E_g,E_norm,M_r,x,xi_r,xi_h'"
 fi
 
-# use the scaling relations to calculate lower frequency bound 
-# only works on .GYRE files for now 
-if [ $SCALE -gt 0 ]; then
-    # get the first line of the GYRE file 
-    read -r FIRSTLINE < "$INPUT"
-    
-    # pull out M and Rfrom the GYRE file of the stellar model 
-    M=$(echo $FIRSTLINE | awk '{print $2}')
-    R=$(echo $FIRSTLINE | awk '{print $3}')
-    
-    # get Teff from the 7th column of the profile file header 
-    T=$(sed '3q;d' "${INPUT::-5}" | awk '{print $7}')
-    
-    # divide by the solar values 
-    Mscal=$(awk '{ print $1 / 1.988475E+33 }' <<< "$M")
-    Rscal=$(awk '{ print $1 / 6.957E+10 }' <<< "$R")
-    Tscal=$(awk '{ print $1 / 5772 }' <<< "$T")
-    
-    # calculate scaling relations 
-    # numax = M/R**2/sqrt(Teff/5777)
-    # Dnu   = sqrt(M/R**3)
-    numax=$(awk -v M="$Mscal" -v R="$Rscal" -v T="$Tscal" \
-        'BEGIN { print M / R^2 * T^(-1/2) * 3090 }')
-    Dnu=$(awk -v M="$Mscal" -v R="$Rscal" \
-        'BEGIN { print (M / R^3)^(1/2) * 135 }')
-    
-    # find lower limit 
-    LOWER=$(awk -v numax="$numax" -v Dnu="$Dnu" \
-        'BEGIN { print numax - 10*Dnu }')
-    
-	#UPPER=$(awk -v numax="$numax" \
-	#    'BEGIN { print numax * 5/3 }')
-	
-    # check that it's greater than 0.1 
-    if [ $(echo "$LOWER < 0.1" | bc -l) -gt 0 ]; then
-        LOWER=0.1
-    fi
-fi
-
 ## Create a directory for the results and go there
 mkdir -p "$path" 
-#cp "$INPUT" "$path" 
 cd "$path" 
 
 logfile="gyre-l0.log"
@@ -223,8 +180,8 @@ $MODES
 
 &scan
     grid_type = '$GRID_TYPE'
-    freq_min_units = '$UNITS' !'UHZ'
-    freq_max_units = 'ACOUSTIC_CUTOFF' !'$UNITS' !'UHZ'
+    freq_min_units = '$UNITS'
+    freq_max_units = 'ACOUSTIC_CUTOFF'
     freq_min = $LOWER
     freq_max = 1 !$UPPER
     n_freq = $N_FREQ
@@ -239,7 +196,7 @@ $GRID
     summary_file = '$fname.dat'
     summary_file_format = 'TXT'
     summary_item_list = 'l,n_pg,n_p,n_g,freq,E_norm'
-    freq_units = '$UNITS' !'UHZ'
+    freq_units = '$UNITS'
     $MODE_ITEM_LIST
 /
 
@@ -249,9 +206,7 @@ $GRID
 " >| "gyre.in"
 
 ## Run GYRE
-#exit
 $GYRE_DIR/bin/gyre gyre.in &>gyre.out
-#exit 
 
 ### Hooray!
 if [ -f "$fname.dat" ]; then
