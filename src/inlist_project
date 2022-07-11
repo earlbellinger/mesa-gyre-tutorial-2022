@@ -34,7 +34,7 @@
     
   ! stop when the center mass fraction of h1 drops below this limit
     !xa_central_lower_limit_species(1) = 'h1'
-    !xa_central_lower_limit(1) = 1d-5
+    !xa_central_lower_limit(1) = 0.1
     
   ! input physics 
     do_element_diffusion = .true.
