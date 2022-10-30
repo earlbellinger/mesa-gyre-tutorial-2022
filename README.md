@@ -18,7 +18,7 @@ Here we accomplish the following:
 - Visualize asteroseismic evolution of the grid in a CD diagram 
 
 **Recording** (90 minutes) \
-[![Recording](https://i.imgur.com/5tnfIOP.png)](https://www.youtube.com/watch?v=6pLegYZVCLM)
+[![Recording](https://i.imgur.com/5tnfIOP.png)](https://youtu.be/6pLegYZVCLM?t=79)
 
 [Earl Patrick Bellinger](https://earlbellinger.com)<sup>1,2</sup>\
 <sub><sup>1</sup> Max Planck Institute for Astrophysics, Germany</sub>\
